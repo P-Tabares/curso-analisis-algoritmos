@@ -45,7 +45,7 @@
 
 **Lo que puede mejorar:**
 - Las funciones de `parte3_casos.py` y `parte4_complejidad.py` no tienen *docstring* ni *type hints*; tampoco `datos.py` ni `algoritmos.py` cuidan del todo el formato.
-- Hay muchos incumplimientos de PEP 8: espacios al final de línea, falta de dos líneas en blanco entre funciones y líneas muy largas.
+- Hay muchos incumplimientos de PEP 8: falta de dos líneas en blanco entre funciones y líneas muy largas.
 - La función auxiliar `_mezclar` tiene un *docstring* corto, sin las secciones Args y Returns.
 - Los generadores aleatorios cambian la semilla global de Python; es mejor usar un generador propio.
 
