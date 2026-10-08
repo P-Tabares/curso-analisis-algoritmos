@@ -5,6 +5,7 @@ import time
 from typing import Callable
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 from subarreglo import subarreglo_fuerza_bruta, subarreglo_maximo
 
@@ -138,6 +139,7 @@ def graficar(
     plt.xlabel("Tamano de entrada n (numero de dias)")
     plt.ylabel("Tiempo de ejecucion (milisegundos)")
     plt.grid(True, which="both", alpha=0.3)
+    plt.gca().yaxis.set_major_locator(MaxNLocator(nbins=12, prune=None))
     plt.legend()
     plt.tight_layout()
     plt.savefig(ruta, dpi=150)
