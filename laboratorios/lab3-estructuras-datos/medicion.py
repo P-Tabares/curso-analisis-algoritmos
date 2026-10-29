@@ -1,4 +1,5 @@
 """Medicion del tiempo de busqueda en ListaEnlazada y TablaHash."""
+
 import gc
 import os
 import random
@@ -192,7 +193,9 @@ def ejecutar_experimento_a(
 
     max_n = max(tamanos)
     todos_envios, _ = generar_envios(max_n, SEMILLA_DATOS)
+    casos: list[tuple[int, int, list[int], ListaEnlazada, TablaHash]] = []
 
+    # Primero se construye todo (fuera del cronometro) y despues se mide
     for n in tamanos:
         envios = todos_envios[:n]
         existentes = {guia for guia, _ in envios}
@@ -202,14 +205,14 @@ def ejecutar_experimento_a(
 
         m = primo_cercano(max(2, n // 2))
         lista = ListaEnlazada()
-        tabla = TablaHash(m)
-
         for guia, estado in envios:
             lista.insertar(guia, estado)
+        tabla = TablaHash(m)
+        for guia, estado in envios:
             tabla.insertar(guia, estado)
 
         # Verificar que ambas estructuras devuelven el mismo estado
-        # para una muestra de guias existentes e inexistentes.
+        # para una muestra de guias existentes e inexistentes
         paso = max(1, n // MUESTRA_VERIFICACION)
         for guia, estado_esperado in envios[::paso]:
             estado_lista = lista.buscar(guia)
@@ -221,18 +224,17 @@ def ejecutar_experimento_a(
             assert lista.buscar(guia_no_existe) is None
             assert tabla.buscar(guia_no_existe) is None
 
+        casos.append((n, m, inexistentes, lista, tabla))
+
+    for n, m, inexistentes, lista, tabla in casos:
         reps_lista = 5 if n <= 1000 else (3 if n <= 10000 else 1)
         t_lista = medir_busquedas_lista(lista, inexistentes, reps_lista)
-        t_tabla = medir_busquedas_tabla(tabla, inexistentes, 100)
+        t_tabla = medir_busquedas_tabla(tabla, inexistentes, 150)
 
         casillas_m.append(m)
         alfas.append(tabla.factor_carga())
         tiempos_lista.append(t_lista)
         tiempos_tabla.append(t_tabla)
-
-        del lista
-        del tabla
-        gc.collect()
 
     return casillas_m, alfas, tiempos_lista, tiempos_tabla
 
@@ -256,7 +258,7 @@ def ejecutar_experimento_b(
         existentes, CANTIDAD_BUSQUEDAS, SEMILLA_INEXISTENTES
     )
 
-    # Lista de referencia para verificar consistencia en la muestra.
+    # Lista de referencia para verificar consistencia en la muestra
     lista_ref = ListaEnlazada()
     for guia, estado in envios[:MUESTRA_VERIFICACION]:
         lista_ref.insertar(guia, estado)
@@ -265,6 +267,7 @@ def ejecutar_experimento_b(
     alfas_reales: list[float] = []
     tiempos_tabla: list[float] = []
 
+    tablas: list[tuple[int, TablaHash]] = []
     for alfa_obj in alfas_objetivo:
         m = primo_cercano(int(round(n_fijo / alfa_obj)))
         tabla = TablaHash(m)
@@ -275,14 +278,13 @@ def ejecutar_experimento_b(
             assert tabla.buscar(guia) == estado_esperado
             assert tabla.buscar(guia) == lista_ref.buscar(guia)
 
-        t_tabla = medir_busquedas_tabla(tabla, inexistentes, 100)
+        tablas.append((m, tabla))
 
+    for m, tabla in tablas:
+        t_tabla = medir_busquedas_tabla(tabla, inexistentes, 150)
         casillas_m.append(m)
         alfas_reales.append(tabla.factor_carga())
         tiempos_tabla.append(t_tabla)
-
-        del tabla
-        gc.collect()
 
     return casillas_m, alfas_reales, tiempos_tabla
 
@@ -428,7 +430,8 @@ def imprimir_resultados_b(
         tiempos_tabla: tiempos medios de TablaHash en segundos.
     """
     print(
-        f"=== Experimento B: Efecto del factor de carga alfa (n = {n_fijo}) ==="
+        f"=== Experimento B: Efecto del factor de carga alfa "
+        f"(n = {n_fijo}) ==="
     )
     print(
         f"{'m':>7} {'alfa':>8} {'1 + alfa':>10} "
