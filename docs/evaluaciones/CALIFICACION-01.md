@@ -73,7 +73,7 @@
 - Las instrucciones de activación del entorno solo cubren Windows y Git Bash.
 
 ## ¿El código funciona?
-Sí. Los dos programas corren sin errores, generan las tres gráficas y los dos algoritmos ordenan correctamente en mis pruebas con listas pequeñas, aleatorias, casi ordenadas e inversas.
+Sí. Los dos programas corren sin errores, generan las tres gráficas y los dos algoritmos ordenan correctamente con listas pequeñas, aleatorias, casi ordenadas e inversas.
 
 ## Para el próximo laboratorio
 - Haga commits pequeños y frecuentes con mensajes que cuenten qué cambió.
